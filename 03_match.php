@@ -46,7 +46,7 @@ while($line = fgetcsv($fh, 2048)) {
 foreach($targetGroups AS $group) {
     if(count($group) > 2) {
         foreach($group AS $issue) {
-            $jsonFile = __DIR__ . '/extract/' . $issue[0];
+            $jsonFile = __DIR__ . '/filter/' . $issue[0];
             $json = json_decode(file_get_contents($jsonFile));
             print_r($json);
         }
