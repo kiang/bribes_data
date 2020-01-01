@@ -9,6 +9,10 @@ class SetEncoder(json.JSONEncoder):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
 
+toSkip = [
+    '200610/臺灣高等法院臺中分院刑事/TCHM,95,選上訴,1051,20061025,1.json'
+]
+
 pos = POS("ckip/data")
 ner = NER("ckip/data")
 with open('targets.csv') as csvFile:
@@ -16,10 +20,12 @@ with open('targets.csv') as csvFile:
     next(rows)
     for row in rows:
         with open('filter/' + row[0]) as jsonFile:
-            print("processing " + row[0] + "\n")
+            if row[0] in toSkip:
+                continue
             targetFile = 'meta/' + row[0]
             if os.path.exists(targetFile):
                 continue
+            print("processing " + row[0])
             dirname = os.path.dirname(targetFile)
             if False == os.path.exists(dirname):
                 os.makedirs(dirname, 0o777)
