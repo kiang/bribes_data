@@ -16,6 +16,7 @@ with open('targets.csv') as csvFile:
     next(rows)
     for row in rows:
         with open('filter/' + row[0]) as jsonFile:
+            print("processing " + row[0] + "\n")
             targetFile = 'meta/' + row[0]
             if os.path.exists(targetFile):
                 continue
