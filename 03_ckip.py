@@ -10,7 +10,9 @@ class SetEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 toSkip = [
-    '200610/臺灣高等法院臺中分院刑事/TCHM,95,選上訴,1051,20061025,1.json'
+    '200610/臺灣高等法院臺中分院刑事/TCHM,95,選上訴,1051,20061025,1.json',
+    '200701/臺灣高等法院高雄分院民事/KSHV,95,選上,5,20070117,1.json',
+    '200807/臺灣高等法院臺中分院刑事/TCHM,97,選上更(二),126,20080703,1.json'
 ]
 
 pos = POS("ckip/data")

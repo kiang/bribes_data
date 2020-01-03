@@ -46,10 +46,22 @@ while($line = fgetcsv($fh, 2048)) {
 foreach($targetGroups AS $group) {
     if(count($group) > 2) {
         foreach($group AS $issue) {
-            $jsonFile = __DIR__ . '/filter/' . $issue[0];
-            $json = json_decode(file_get_contents($jsonFile));
-            print_r($json);
+            $origin = json_decode(file_get_contents(__DIR__ . '/filter/' . $issue[0]));
+            print_r($origin); exit();
+            $jsonFile = __DIR__ . '/meta/' . $issue[0];
+            if(file_exists($jsonFile)) {
+                $json = json_decode(file_get_contents($jsonFile));
+                if(is_array($json[0])) {
+                    foreach($json[0] AS $item) {
+                        switch($item[2]) {
+                            // case 'MONEY':
+                            case 'LOC':
+                                print_r($item);
+                            break;
+                        }
+                    }
+                }
+            }
         }
-        exit();
     }
 }
