@@ -43,30 +43,43 @@ while($line = fgetcsv($fh, 2048)) {
         }
     }
 }
+function cmp($a, $b)
+{
+    if ($a[0] == $b[0]) {
+        return 0;
+    }
+    return ($a[0] < $b[0]) ? -1 : 1;
+}
 $newLine = "\n";
 foreach($targetGroups AS $group) {
     if(count($group) > 2) {
         foreach($group AS $issue) {
             $origin = json_decode(file_get_contents(__DIR__ . '/filter/' . $issue[0]));
             $jsonFile = __DIR__ . '/meta/' . $issue[0];
-            if(file_exists($jsonFile)) {
-                $json = json_decode(file_get_contents($jsonFile));
-                if(is_array($json[0])) {
-                    $itemIndex = $pos = 0;
-                    $fullTextLength = mb_strlen($origin->JFULL, 'utf-8');
-                    $previousLine = "";
-                    while($pos < $fullTextLength) {
-                        $nextLinePos = mb_strpos($origin->JFULL, $newLine, $pos, 'utf-8');
-                        if($nextLinePos > $json[0][$itemIndex][0]) {
-                            echo "\n{$previousLine}";
-                            echo "\n" . mb_substr($origin->JFULL, $pos, $nextLinePos - $pos, 'utf-8') . "\n";
+            $json = json_decode(file_get_contents($jsonFile));
+            usort($json[0], "cmp");
+            $itemIndex = $pos = $nextLinePos = 0;
+            $fullTextLength = mb_strlen($origin->JFULL, 'utf-8');
+            $previousLine = "";
+            while($pos < $fullTextLength && false !== $nextLinePos) {
+                $nextLinePos = mb_strpos($origin->JFULL, $newLine, $pos + 1, 'utf-8');
+                $currentLine = mb_substr($origin->JFULL, $pos, $nextLinePos - $pos, 'utf-8');
+
+                while(isset($json[0][$itemIndex]) && $json[0][$itemIndex][2] !== 'MONEY') {
+                    ++$itemIndex;
+                }
+                if(isset($json[0][$itemIndex]) && ($nextLinePos > $json[0][$itemIndex][0])) {
+                    echo "\n\n{$previousLine}";
+                    echo "\n{$currentLine}\n";
+                    while(isset($json[0][$itemIndex]) && ($nextLinePos > $json[0][$itemIndex][0])) {
+                        if($json[0][$itemIndex][2] === 'MONEY') {
                             print_r($json[0][$itemIndex]);
-                            exit();
                         }
-                        $previousLine = mb_substr($origin->JFULL, $pos, $nextLinePos - $pos, 'utf-8');
-                        $pos = $nextLinePos + 1;
+                        ++$itemIndex;
                     }
                 }
+                $previousLine = $currentLine;
+                $pos = $nextLinePos;
             }
             exit();
         }
