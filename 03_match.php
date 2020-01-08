@@ -43,25 +43,32 @@ while($line = fgetcsv($fh, 2048)) {
         }
     }
 }
+$newLine = "\n";
 foreach($targetGroups AS $group) {
     if(count($group) > 2) {
         foreach($group AS $issue) {
             $origin = json_decode(file_get_contents(__DIR__ . '/filter/' . $issue[0]));
-            print_r($origin); exit();
             $jsonFile = __DIR__ . '/meta/' . $issue[0];
             if(file_exists($jsonFile)) {
                 $json = json_decode(file_get_contents($jsonFile));
                 if(is_array($json[0])) {
-                    foreach($json[0] AS $item) {
-                        switch($item[2]) {
-                            // case 'MONEY':
-                            case 'LOC':
-                                print_r($item);
-                            break;
+                    $itemIndex = $pos = 0;
+                    $fullTextLength = mb_strlen($origin->JFULL, 'utf-8');
+                    $previousLine = "";
+                    while($pos < $fullTextLength) {
+                        $nextLinePos = mb_strpos($origin->JFULL, $newLine, $pos, 'utf-8');
+                        if($nextLinePos > $json[0][$itemIndex][0]) {
+                            echo "\n{$previousLine}";
+                            echo "\n" . mb_substr($origin->JFULL, $pos, $nextLinePos - $pos, 'utf-8') . "\n";
+                            print_r($json[0][$itemIndex]);
+                            exit();
                         }
+                        $previousLine = mb_substr($origin->JFULL, $pos, $nextLinePos - $pos, 'utf-8');
+                        $pos = $nextLinePos + 1;
                     }
                 }
             }
+            exit();
         }
     }
 }
